@@ -5,6 +5,8 @@
     @keydown="handleKeyDown"
     @keyup="handleKeyUp"
     @mouseenter="$refs.container.focus()"
+    @mousedown="handleMouseDown"
+    @contextmenu.prevent
   >
     <div class="header">
       <filter-panel level="imageclassifier" />
@@ -25,20 +27,25 @@
 </template>
 <script lang="ts">
   import Vue from 'vue';
-  import { Component } from 'vue-property-decorator';
+  import { Component, Watch } from 'vue-property-decorator';
   import gql from 'graphql-tag';
   import FilterPanel from '../../../components/FilterPanel.vue';
   import ImageClassifierBlock from './ImageClassifierBlock.vue';
+  import * as config from '../../../clientConfig.json';
 
   const countAnnotationsQuery = gql`query CountAnnotations($filter: AnnotationFilter, $datasetFilter: DatasetFilter) {
     countAnnotations(filter: $filter, datasetFilter: $datasetFilter)
   }`;
 
-  const onKeys = ['v','f','CTRL'];
-  const offKeys = ['c','d','SHIFT'];
+  const onKeys = ['v','f','CTRL', 'MOUSE0'];
+  const offKeys = ['c','d','SHIFT', 'MOUSE2'];
   const indKeys = ['x','s']; // or both an onKey and offKey
   const undoKeys = ['z','a'];
-  const keysToPrevent = [].concat(onKeys, offKeys, indKeys, undoKeys);
+  const keysToPrevent = [...onKeys, ...offKeys, ...indKeys, ...undoKeys];
+
+  const qs = (obj: Object) => '?' + Object.entries(obj)
+    .map(([key, val]) => `${encodeURIComponent(key)}=${encodeURIComponent(val)}`)
+    .join('&');
 
   @Component({
     components: {
@@ -51,7 +58,10 @@
         variables(this: ImageClassifierPage) {
           return this.gqlFilter;
         },
-        loadingKey: 'loading'
+        loadingKey: 'loading',
+        skip(this: ImageClassifierPage) {
+          return !this.datasetId || !this.user;
+        }
       },
     },
   })
@@ -64,19 +74,14 @@
     annotationLabels: Record<string, number> = {};
 
     created() {
-      // document.addEventListener('keydown', this.handleKeyDown);
-      // document.addEventListener('keyup', this.handleKeyUp);
-      // document.addEventListener('mousedown', this.handleMouseDown);
-      // document.addEventListener('mouseup', this.handleMouseUp);
+      this.loadLabels();
+      document.addEventListener('mouseup', this.handleMouseUp);
     }
     mounted() {
       (this.$refs.container as any).focus();
     }
     beforeDestroy() {
-      // document.removeEventListener('keydown', this.handleKeyDown);
-      // document.removeEventListener('keyup', this.handleKeyUp);
-      // document.addEventListener('mousedown', this.handleMouseDown);
-      // document.addEventListener('mouseup', this.handleMouseUp);
+      document.removeEventListener('mouseup', this.handleMouseUp);
     }
 
     get gqlFilter () {
@@ -87,15 +92,18 @@
     }
 
     get blocks() {
-      const blockSize = 100;
+      const blockSize = 12;
       const block = [];
       for (let i = 0; i < (this.countAnnotations || 0); i += blockSize) {
         block.push({ offset: i, limit: Math.min(blockSize, (this.countAnnotations || 0) - i) })
       }
       return block;
     }
-    get datasetFilter() {
-      return { ids: '2016-12-09_10h16m23s' };
+    get datasetId(): string {
+      return this.$store.getters.gqlDatasetFilter.ids;
+    }
+    get user(): string {
+      return this.$route.query.user;
     }
 
     handleKeyDown(event: KeyboardEvent) {
@@ -111,6 +119,27 @@
       if (keysToPrevent.includes(event.key)) {
         event.preventDefault();
       }
+      this.doSelection();
+    }
+
+    handleMouseDown(event: MouseEvent) {
+      const key = `MOUSE${event.button}`;
+      this.keys[key] = true;
+      if (keysToPrevent.includes(key)) {
+        event.preventDefault();
+      }
+      this.doSelection();
+    }
+
+    handleMouseUp(event: MouseEvent) {
+      const key = `MOUSE${event.button}`;
+      if (this.keys[key]) {
+        this.keys[key] = false;
+        if (keysToPrevent.includes(key)) {
+          event.preventDefault();
+        }
+      }
+      this.doSelection();
     }
 
     handleMouseEnter(event: MouseEvent & { annotationId: string }) {
@@ -124,7 +153,7 @@
       }
     }
 
-    doSelection() {
+    async doSelection() {
       if (this.overAnnotationId) {
         const on = onKeys.some(key => this.keys[key]);
         const off = offKeys.some(key => this.keys[key]);
@@ -132,9 +161,53 @@
         const undo = undoKeys.some(key => this.keys[key]);
 
         if (on || off || ind || undo) {
-          const val = undo ? null : ind ? 3 : on ? 1 : 2;
-          Vue.set(this.annotationLabels, this.overAnnotationId, val);
+          const type = undo ? null : ind ? 3 : on ? 1 : 2;
+          if (this.annotationLabels[this.overAnnotationId] !== type) {
+            const query = qs({
+              datasetId: this.datasetId,
+              user: this.user,
+              annotationId: this.overAnnotationId,
+              type
+            });
+            Vue.set(this.annotationLabels, this.overAnnotationId, type);
+            try {
+              await fetch(`${config.imageClassifierUrl}${query}`, { method: 'POST' });
+            } catch (err) {
+              this.$alert(err, "Something went terribly wrong");
+              Vue.set(this.annotationLabels, this.overAnnotationId, 4);
+            }
+          }
         }
+      }
+    }
+
+    @Watch('datasetId')
+    @Watch('user')
+    async loadLabels() {
+      const datasetId = this.datasetId;
+      const user = this.user;
+
+      if (datasetId && user) {
+        const query = qs({ datasetId, user });
+        try {
+          this.loading += 1;
+          const response = await fetch(`${config.imageClassifierUrl}${query}`);
+          const labels = await response.json();
+          // Double-check nothing has changed while loading
+          if (datasetId === this.datasetId && user === this.user) {
+            this.annotationLabels = labels;
+          }
+        } catch (err) {
+          console.log(err);
+          if (datasetId === this.datasetId && user === this.user) {
+            this.annotationLabels = {};
+            this.$alert("Could not load previous classifications")
+          }
+        } finally {
+          this.loading -= 1;
+        }
+      } else {
+        this.annotationLabels = {};
       }
     }
   }

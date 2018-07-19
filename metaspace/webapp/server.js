@@ -7,7 +7,8 @@ const AWS = require('aws-sdk'),
       favicon = require('serve-favicon'),
       session = require('express-session'),
       GoogleStrategy = require('passport-google-oauth20').Strategy,
-      Raven = require('raven');
+      Raven = require('raven'),
+      {configureImageClassifier} = require('./imageClassifier');
 
 const env = process.env.NODE_ENV || 'development';
 const conf = require('./conf.js');
@@ -297,7 +298,7 @@ const configureUploadHandler = (app) => {
   }
 };
 
-const startServer = () => {
+const startServer = async () => {
   const app = express();
   const knex = configureKnex();
 
@@ -318,6 +319,7 @@ const startServer = () => {
 
   configureJwtMinting(app, knex);
   configureAppServer(app);
+  await configureImageClassifier(app);
   configureUploadHandler(app);
   configureRavenErrorHandler(app);
 
@@ -326,4 +328,7 @@ const startServer = () => {
   });
 };
 
-startServer();
+startServer().catch(err => {
+  console.error(err);
+  exit(1);
+});

@@ -1,5 +1,5 @@
 <template>
-  <intersect @change="handleVisibilityChange" :threshold="[0,0]" rootMargin="1000px">
+  <intersect @change="handleVisibilityChange" :threshold="[0,0]" rootMargin="2000px">
     <div v-loading="loading">
       <div v-for="(row, idx) in rows"
            :key="idx"
@@ -78,7 +78,7 @@
     mz: number;
     isotopeImages: MzImage[];
   }
-  type AnnotationLabel = undefined | 1 | 2 | 3;
+  type AnnotationLabel = undefined | 1 | 2 | 3 | 4; // none / on- / off- / ind / error
 
   @Component({
     components: {
@@ -151,7 +151,6 @@
 
     handleVisibilityChange(intersection: IntersectionObserverEntry[]) {
       this.isVisible = intersection[0].isIntersecting;
-      console.log(`${this.isVisible ? 'showing' : 'hiding'} block ${this.offset}`, intersection);
     }
   }
 </script>
@@ -177,7 +176,10 @@
       background-color: #FFCCCC;
     }
     &.indeterminate {
-      background-color: #DDDDDD;
+      background-color: #FFFFCC;
+    }
+    &.error {
+      background-color: #FF0000;
     }
   }
 
