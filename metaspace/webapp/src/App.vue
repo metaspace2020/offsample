@@ -1,7 +1,7 @@
 <template>
   <div id="app">
-    <metaspace-header>
-    </metaspace-header>
+    <!--<metaspace-header>-->
+    <!--</metaspace-header>-->
 
     <router-view class="main-content">
     </router-view>

@@ -24,7 +24,7 @@
             />
           <div class="subtitle">
             <div>{{annotation.sumFormula}}</div>
-            <div>{{ parseFloat(annotation.mz).toFixed(3) }}</div>
+            <div>{{ parseFloat(annotation.mz).toFixed(4) }}</div>
           </div>
         </div>
         <div v-else />
