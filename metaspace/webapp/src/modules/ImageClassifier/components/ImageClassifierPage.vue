@@ -10,6 +10,13 @@
   >
     <div class="header">
       <filter-panel level="imageclassifier" />
+      <ul>
+        <li>Left-click, V or F to mark an image as <span style="background-color: #CCFFCC" >on-sample</span></li>
+        <li>Right-click, C or D to mark an image as <span style="background-color: #FFCCCC" >off-sample</span></li>
+        <li>both mouse buttons, X or S to mark an image as <span style="background-color: #FFFFCC" >unknown</span></li>
+        <li>Z or A to unmark an image</li>
+        <li>You can click-and-drag or press a key and sweep your mouse across multiple images to mark them quickly</li>
+      </ul>
     </div>
     <div class="list" v-loading="loading">
       <image-classifier-block
@@ -22,6 +29,9 @@
         @mouseenter="handleMouseEnter"
         @mouseleave="handleMouseLeave"
       />
+    </div>
+    <div v-if="countAnnotations === 0">
+      Please select a dataset.
     </div>
   </div>
 </template>
@@ -60,7 +70,11 @@
         },
         loadingKey: 'loading',
         skip(this: ImageClassifierPage) {
-          return !this.datasetId || !this.user;
+          if (!this.datasetId || !this.user) {
+            this.countAnnotations = 0;
+            return true;
+          }
+          return false;
         }
       },
     },

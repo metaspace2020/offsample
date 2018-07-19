@@ -63,7 +63,7 @@ const FILTER_SPECIFICATIONS = {
     name: 'Database',
     description: 'Select database',
     levels: ['annotation', 'imageclassifier'],
-    defaultInLevels: ['annotation', 'imageclassifier'],
+    defaultInLevels: ['annotation'],
     initialValue: lists => lists.molecularDatabases
                                 .filter(d => d.default)
                                 .map(d => d.name)[0],

@@ -1,5 +1,5 @@
 <template>
-  <tag-filter :name="name" @destroy="destroy" :width=900>
+  <tag-filter :name="name" @destroy="destroy" :removable="false" :width=900>
     <el-select slot="edit"
                ref="select"
                placeholder="Start typing dataset name"
@@ -8,7 +8,7 @@
                :loading="loading"
                loading-text="Loading matching entries..."
                no-match-text="No matches"
-               :multiple-limit=10
+               :multiple-limit=1
                v-model="value2" @change="onChange">
       <el-option v-for="(item, idx) in options"
                  :label="item.label"
