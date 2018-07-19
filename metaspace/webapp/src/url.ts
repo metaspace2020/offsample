@@ -32,6 +32,7 @@ const FILTER_TO_URL: Dictionary<string> = {
 const URL_TO_FILTER: Dictionary<string> = invert(FILTER_TO_URL);
 
 const PATH_TO_LEVEL: Dictionary<string> = {
+  '/imageclassifier': 'imageclassifier',
   '/annotations': 'annotation',
   '/datasets': 'dataset',
   '/datasets/summary': 'dataset',

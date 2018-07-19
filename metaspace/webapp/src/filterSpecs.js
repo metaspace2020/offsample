@@ -62,22 +62,23 @@ const FILTER_SPECIFICATIONS = {
     type: SingleSelectFilter,
     name: 'Database',
     description: 'Select database',
-    levels: ['annotation'],
-    defaultInLevels: ['annotation'],
+    levels: ['annotation', 'imageclassifier'],
+    defaultInLevels: ['annotation', 'imageclassifier'],
     initialValue: lists => lists.molecularDatabases
                                 .filter(d => d.default)
                                 .map(d => d.name)[0],
     options: lists => lists.molecularDatabases.map(d => d.name),
-    removable: false
+    // removable: true // FIXME: If Off-Sample is kept, this must be false for the 'annotation' level
   },
 
   datasetIds: {
     type: DatasetNameFilter,
     name: 'Dataset',
     description: 'Select dataset',
-    levels: ['annotation', 'dataset'],
+    levels: ['annotation', 'dataset', 'imageclassifier'],
+    defaultInLevels: ['imageclassifier'],
     initialValue: undefined,
-
+    removable: false, // FIXME: If Off-Sample is kept, this must be false for the 'annotation' level
     encoding: 'list'
   },
 
@@ -124,7 +125,7 @@ const FILTER_SPECIFICATIONS = {
     type: SingleSelectFilter,
     name: 'FDR',
     description: 'Select FDR level',
-    levels: ['annotation'],
+    levels: ['annotation', 'imageclassifier'],
     defaultInLevels: ['annotation'],
     initialValue: 0.1,
 
@@ -149,7 +150,7 @@ const FILTER_SPECIFICATIONS = {
     type: SingleSelectFilter,
     name: 'Submitter',
     description: 'Select submitter',
-    levels: ['annotation', 'dataset'],
+    levels: ['annotation', 'dataset', 'imageclassifier'],
     initialValue: undefined,
 
     encoding: 'json',
@@ -165,7 +166,7 @@ const FILTER_SPECIFICATIONS = {
     type: SingleSelectFilter,
     name: 'Polarity',
     description: 'Select polarity',
-    levels: ['annotation', 'dataset'],
+    levels: ['annotation', 'dataset', 'imageclassifier'],
     initialValue: undefined,
 
     // FIXME: this ideally should be taken straight from the JSON schema
@@ -257,8 +258,8 @@ const FILTER_SPECIFICATIONS = {
     type: SingleSelectFilter,
     name: 'Data type',
     description: 'Select data type',
-    levels: ['annotation', 'dataset', 'upload'],
-    defaultInLevels: ['annotation', 'dataset', 'upload'],
+    levels: ['annotation', 'dataset', 'upload', 'imageclassifier'],
+    defaultInLevels: ['annotation', 'dataset', 'upload', 'imageclassifier'],
     initialValue: defaultMetadataType,
     removable: false,
     options: metadataTypes,

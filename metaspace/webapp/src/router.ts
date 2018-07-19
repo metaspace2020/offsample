@@ -32,7 +32,8 @@ const router = new VueRouter({
       component: async () => await import(/* webpackPrefetch: true, webpackChunkName: "UploadPage" */ './components/UploadPage.vue')
     },
     { path: '/about', component: AboutPage },
-    { path: '/help', component: async () => await import(/* webpackPrefetch: true, webpackChunkName: "HelpPage" */ './components/HelpPage.vue') }
+    { path: '/help', component: async () => await import(/* webpackPrefetch: true, webpackChunkName: "HelpPage" */ './components/HelpPage.vue') },
+    { path: '/imageclassifier', component: async () => (await import(/* webpackPrefetch: true, webpackChunkName: "ImageClassifierPage" */ './modules/ImageClassifier')).ImageClassifierPage  },
   ]
 })
 

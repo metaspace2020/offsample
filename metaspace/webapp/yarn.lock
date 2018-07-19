@@ -12001,6 +12001,12 @@ vue-hot-reload-api@^2.3.0:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/vue-hot-reload-api/-/vue-hot-reload-api-2.3.0.tgz#97976142405d13d8efae154749e88c4e358cf926"
 
+vue-intersect@^1.1.2:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/vue-intersect/-/vue-intersect-1.1.2.tgz#e6a3905ecb11f515afa00e52ef4911c3e6fad640"
+  dependencies:
+    vue "^2.4.2"
+
 vue-lazyload@^1.0.0-rc5:
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/vue-lazyload/-/vue-lazyload-1.0.5.tgz#767c041472e85237c6efa8a486badfa4dbb96edb"
@@ -12057,7 +12063,7 @@ vue-template-es2015-compiler@^1.6.0:
   version "1.6.0"
   resolved "https://registry.yarnpkg.com/vue-template-es2015-compiler/-/vue-template-es2015-compiler-1.6.0.tgz#dc42697133302ce3017524356a6c61b7b69b4a18"
 
-vue@~2.5.16:
+vue@^2.4.2, vue@~2.5.16:
   version "2.5.16"
   resolved "https://registry.yarnpkg.com/vue/-/vue-2.5.16.tgz#07edb75e8412aaeed871ebafa99f4672584a0085"
 
