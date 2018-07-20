@@ -10,3 +10,4 @@ declare module 'vue-intersect';
 
 declare module "plotly.js/src/components/colorscale/scales.js"
 declare module "plotly.js/src/components/colorscale/extract_scale.js"
+declare module 'dom-confetti';

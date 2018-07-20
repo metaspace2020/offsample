@@ -1,6 +1,7 @@
 <template>
   <div
     ref="container"
+    class="container"
     :tabindex="0"
     @keydown="handleKeyDown"
     @keyup="handleKeyUp"
@@ -8,13 +9,19 @@
     @mousedown="handleMouseDown"
     @contextmenu.prevent
   >
+    <div class="floatingHeader">
+      <div style="background-color: #CCFFCC" >{{ stats.on }} on-sample</div>
+      <div style="background-color: #FFCCCC" >{{ stats.off }} off-sample</div>
+      <div style="background-color: #FFFFCC" >{{ stats.ind }} unknown</div>
+      <div style="background-color: #CCFFCC" >{{ stats.un }} unassigned</div>
+    </div>
     <div class="header">
       <filter-panel level="imageclassifier" />
       <ul>
-        <li>Left-click, V or F to mark an image as <span style="background-color: #CCFFCC" >on-sample</span></li>
-        <li>Right-click, C or D to mark an image as <span style="background-color: #FFCCCC" >off-sample</span></li>
-        <li>both mouse buttons, X or S to mark an image as <span style="background-color: #FFFFCC" >unknown</span></li>
-        <li>Z or A to unmark an image</li>
+        <li>Left-click or + to mark an image as <span style="background-color: #CCFFCC" >on-sample</span></li>
+        <li>Right-click or - to mark an image as <span style="background-color: #FFCCCC" >off-sample</span></li>
+        <li>Both mouse buttons or 0 to mark an image as <span style="background-color: #FFFFCC" >unknown</span></li>
+        <li>Backspace or Delete to unmark an image</li>
         <li>You can click-and-drag or press a key and sweep your mouse across multiple images to mark them quickly</li>
       </ul>
     </div>
@@ -23,14 +30,14 @@
         v-for="(block, idx) in blocks"
         :key="idx"
         v-bind="block"
-        :gqlFilter="gqlFilter"
         :numCols="numCols"
         :annotationLabels="annotationLabels"
+        :annotations="block"
         @mouseenter="handleMouseEnter"
         @mouseleave="handleMouseLeave"
       />
     </div>
-    <div v-if="countAnnotations === 0">
+    <div v-if="allAnnotations != null && allAnnotations.length === 0">
       Please select a dataset.
     </div>
   </div>
@@ -42,15 +49,34 @@
   import FilterPanel from '../../../components/FilterPanel.vue';
   import ImageClassifierBlock from './ImageClassifierBlock.vue';
   import * as config from '../../../clientConfig.json';
+  import {confetti} from 'dom-confetti';
+  import { chunk, cloneDeep, get, pick, range } from 'lodash-es';
+  import Prando from 'prando';
+  import { ICBlockAnnotation } from './ICBlockAnnotation';
 
-  const countAnnotationsQuery = gql`query CountAnnotations($filter: AnnotationFilter, $datasetFilter: DatasetFilter) {
-    countAnnotations(filter: $filter, datasetFilter: $datasetFilter)
+  const allAnnotationsQuery = gql`query AllAnnotations($filter: AnnotationFilter, $datasetFilter: DatasetFilter) {
+    allAnnotations(filter: $filter, datasetFilter: $datasetFilter,
+                   offset: 0, limit: 10000, orderBy: ORDER_BY_MZ, sortingOrder: ASCENDING) {
+        id
+        sumFormula
+        adduct
+        msmScore
+        fdrLevel
+        mz
+        isotopeImages {
+          mz
+          url
+          minIntensity
+          maxIntensity
+          totalIntensity
+        }
+      }
   }`;
 
-  const onKeys = ['v','f','CTRL', 'MOUSE0'];
-  const offKeys = ['c','d','SHIFT', 'MOUSE2'];
-  const indKeys = ['x','s']; // or both an onKey and offKey
-  const undoKeys = ['z','a'];
+  const onKeys = ['+','=','CTRL', 'MOUSE0'];
+  const offKeys = ['-', 'SHIFT', 'MOUSE2'];
+  const indKeys = ['0']; // or both an onKey and offKey
+  const undoKeys = ['Backspace','Delete'];
   const keysToPrevent = [...onKeys, ...offKeys, ...indKeys, ...undoKeys];
 
   const qs = (obj: Object) => '?' + Object.entries(obj)
@@ -63,55 +89,60 @@
       FilterPanel,
     },
     apollo: {
-      countAnnotations: {
-        query: countAnnotationsQuery,
+      allAnnotations: {
+        query: allAnnotationsQuery,
         variables(this: ImageClassifierPage) {
           return this.gqlFilter;
         },
         loadingKey: 'loading',
         skip(this: ImageClassifierPage) {
           if (!this.datasetId || !this.user) {
-            this.countAnnotations = 0;
+            this.allAnnotations = [];
             return true;
           }
           return false;
-        }
+        },
       },
     },
   })
   export default class ImageClassifierPage extends Vue {
     loading = 0;
     numCols = 4;
-    countAnnotations?: number;
+    allAnnotations?: ICBlockAnnotation[];
     keys: Record<string, boolean> = {};
-    overAnnotationId: string | null = null;
+    selectedAnnotation: ICBlockAnnotation | null = null;
     annotationLabels: Record<string, number> = {};
 
     created() {
       this.loadLabels();
       document.addEventListener('mouseup', this.handleMouseUp);
+      // window.addEventListener('beforeunload', this.handleBeforeUnload);
     }
     mounted() {
       (this.$refs.container as any).focus();
     }
     beforeDestroy() {
       document.removeEventListener('mouseup', this.handleMouseUp);
+      // window.removeEventListener('beforeunload', this.handleBeforeUnload);
     }
 
+    get stats() {
+      let on = 0, off = 0, ind = 0, un = 0;
+      // Who needs efficient algorithms? This still manages to run in <1ms when there are 800 annotations!
+      this.filteredAnnotations.forEach(({id}) => {
+        const label = this.annotationLabels[id];
+        if (label === 1) on++;
+        else if (label === 2) off++;
+        else if (label === 3) ind++;
+        else un++;
+      })
+      return {on, off, ind, un}
+    }
     get gqlFilter () {
       return {
         filter: this.$store.getters.gqlAnnotationFilter,
         datasetFilter: this.$store.getters.gqlDatasetFilter,
       };
-    }
-
-    get blocks() {
-      const blockSize = 12;
-      const block = [];
-      for (let i = 0; i < (this.countAnnotations || 0); i += blockSize) {
-        block.push({ offset: i, limit: Math.min(blockSize, (this.countAnnotations || 0) - i) })
-      }
-      return block;
     }
     get datasetId(): string {
       return this.$store.getters.gqlDatasetFilter.ids;
@@ -119,13 +150,37 @@
     get user(): string {
       return this.$route.query.user;
     }
+    get max(): number {
+      return Number.parseInt(this.$route.query.max) || 1000;
+    }
+    get filteredAnnotations(): ICBlockAnnotation[] {
+      if (this.allAnnotations != null) {
+        const annotations = this.allAnnotations.slice();
+        // Cut down to desired size, hopefully in a relatively repeatable fashion
+        const rng = new Prando(this.datasetId);
+        while (annotations.length > this.max) {
+          annotations.splice(rng.nextInt(0, 5000), 1);
+        }
+        return annotations;
+      }
+      return []
+
+    }
+    get blocks(): ICBlockAnnotation[][] {
+      return chunk(this.filteredAnnotations, 12);
+    }
+
+    handleBeforeUnload(e: Event) {
+      e.preventDefault();
+      e.returnValue = true;
+    }
 
     handleKeyDown(event: KeyboardEvent) {
       this.keys[event.key] = true;
       if (keysToPrevent.includes(event.key)) {
         event.preventDefault();
       }
-      this.doSelection();
+      this.doSelection(event);
     }
 
     handleKeyUp(event: KeyboardEvent) {
@@ -133,7 +188,7 @@
       if (keysToPrevent.includes(event.key)) {
         event.preventDefault();
       }
-      this.doSelection();
+      this.doSelection(event);
     }
 
     handleMouseDown(event: MouseEvent) {
@@ -142,7 +197,7 @@
       if (keysToPrevent.includes(key)) {
         event.preventDefault();
       }
-      this.doSelection();
+      this.doSelection(event);
     }
 
     handleMouseUp(event: MouseEvent) {
@@ -153,42 +208,58 @@
           event.preventDefault();
         }
       }
-      this.doSelection();
+      // this.doSelection(event);
     }
 
-    handleMouseEnter(event: MouseEvent & { annotationId: string }) {
-      this.overAnnotationId = event.annotationId;
-      this.doSelection();
+    handleMouseEnter(event: MouseEvent & { annotation: ICBlockAnnotation }) {
+      this.selectedAnnotation = event.annotation;
+      this.doSelection(event);
     }
 
-    handleMouseLeave(event: MouseEvent & { annotationId: string }) {
-      if (this.overAnnotationId == event.annotationId) {
-        this.overAnnotationId = null;
+    handleMouseLeave(event: MouseEvent & { annotation: ICBlockAnnotation }) {
+      if (this.selectedAnnotation == event.annotation) {
+        this.selectedAnnotation = null;
       }
     }
 
-    async doSelection() {
-      if (this.overAnnotationId) {
+    async doSelection(event?: Event) {
+      if (this.allAnnotations && this.selectedAnnotation) {
         const on = onKeys.some(key => this.keys[key]);
         const off = offKeys.some(key => this.keys[key]);
         const ind = (on && off) || indKeys.some(key => this.keys[key]);
         const undo = undoKeys.some(key => this.keys[key]);
 
+
         if (on || off || ind || undo) {
+          const lastType = this.annotationLabels[this.selectedAnnotation.id];
           const type = undo ? null : ind ? 3 : on ? 1 : 2;
-          if (this.annotationLabels[this.overAnnotationId] !== type) {
-            const query = qs({
-              datasetId: this.datasetId,
-              user: this.user,
-              annotationId: this.overAnnotationId,
-              type
-            });
-            Vue.set(this.annotationLabels, this.overAnnotationId, type);
+          if (lastType !== type) {
+            Vue.set(this.annotationLabels, this.selectedAnnotation.id, type);
+
+            if (!lastType && this.stats.un === 0 && this.allAnnotations.length > 0 && event && event.target) {
+              let el = event.srcElement;
+              while (el && el.parentElement && !el.classList.contains('annotation'))
+                el = el.parentElement;
+
+              confetti(el, {elementCount: 100});
+            }
+
             try {
-              await fetch(`${config.imageClassifierUrl}${query}`, { method: 'POST' });
+              await fetch(`${config.imageClassifierUrl}`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                  datasetId: this.datasetId,
+                  user: this.user,
+                  annotationId: this.selectedAnnotation.id,
+                  type,
+                  ...pick(this.selectedAnnotation, 'sumFormula', 'adduct', 'msmScore', 'fdrLevel', 'mz'),
+                  ionImageUrl: get(this.selectedAnnotation, ['isotopeImages', 0, 'url'])
+                })
+              });
             } catch (err) {
               this.$alert(err, "Something went terribly wrong");
-              Vue.set(this.annotationLabels, this.overAnnotationId, 4);
+              Vue.set(this.annotationLabels, this.selectedAnnotation.id, 4);
             }
           }
         }
@@ -227,5 +298,22 @@
   }
 </script>
 <style scoped lang="scss">
+  .container {
 
+  }
+  .floatingHeader {
+    position: fixed;
+    width: 100%;
+    background-color: white;
+    top: 0;
+    font-size: 20px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    z-index:100;
+    >* {
+      width: 200px;
+      text-align: center;
+    }
+  }
 </style>

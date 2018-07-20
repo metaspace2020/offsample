@@ -3745,6 +3745,10 @@ dns-txt@^2.0.2:
   dependencies:
     buffer-indexof "^1.0.0"
 
+dom-confetti@^0.0.11:
+  version "0.0.11"
+  resolved "https://registry.yarnpkg.com/dom-confetti/-/dom-confetti-0.0.11.tgz#755bd77544202e38573d26463cd00cf648263a60"
+
 dom-to-image@2.6.0:
   version "2.6.0"
   resolved "https://registry.yarnpkg.com/dom-to-image/-/dom-to-image-2.6.0.tgz#8a503608088c87b1c22f9034ae032e1898955867"
@@ -9106,6 +9110,10 @@ postgres-interval@^1.1.0:
   resolved "https://registry.yarnpkg.com/postgres-interval/-/postgres-interval-1.1.0.tgz#1031e7bac34564132862adc9eb6c6d2f3aa75bb4"
   dependencies:
     xtend "^4.0.0"
+
+prando@^3.0.3:
+  version "3.0.3"
+  resolved "https://registry.yarnpkg.com/prando/-/prando-3.0.3.tgz#1248d6d3c07e70bd645ef7bdaaa21c35d0d6d2e0"
 
 prelude-ls@~1.1.2:
   version "1.1.2"

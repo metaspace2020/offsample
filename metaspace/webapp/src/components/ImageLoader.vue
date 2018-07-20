@@ -6,7 +6,7 @@
        :element-loading-text="message">
 
     <div class="image-loader__container" ref="container" style="align-self: center">
-      <div style="text-align: left; z-index: 2; position: relative;">
+      <div style="text-align: left; position: relative;">
         <img :src="dataURI"
              :style="imageStyle"
              @click="onClick"
@@ -16,7 +16,7 @@
              class="isotope-image"/>
       </div>
 
-      <div style="text-align: left; z-index: 1; position: relative">
+      <div style="text-align: left; position: relative">
         <img v-if="opticalSrc"
              :src="opticalImageUrl"
              class="optical-image"
@@ -479,7 +479,6 @@
    font: 24px 'Roboto', sans-serif;
    display: inline-block;
    line-height: 500px;
-   z-index: 4;
    color: #fff;
    padding: auto;
  }
@@ -492,7 +491,6 @@
   position: absolute;
   opacity: 0;
   transition: 1.1s;
-  z-index: 3;
  }
 
  .image-loader__overlay--visible {

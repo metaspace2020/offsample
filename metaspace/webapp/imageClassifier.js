@@ -15,6 +15,12 @@ const configureKnex = async () => {
       table.string('datasetId');
       table.string('user');
       table.string('annotationId');
+      table.string('sumFormula');
+      table.string('adduct');
+      table.string('msmScore');
+      table.string('fdrLevel');
+      table.string('mz');
+      table.string('ionImageUrl');
       table.int('type');
       table.unique(['datasetId','user','annotationId']);
     });
@@ -41,11 +47,11 @@ const configureImageClassifier = async (app) => {
 
   app.post('/imageclassifier', async (req, res, next) => {
     try {
-      const { datasetId, user, annotationId, type } = req.query;
+      const { datasetId, user, annotationId, ...rest } = req.body;
       if ((await knex('imageclassifications').where({ datasetId, user, annotationId })).length > 0) {
-        await knex('imageclassifications').where({ datasetId, user, annotationId }).update({ type });
+        await knex('imageclassifications').where({ datasetId, user, annotationId }).update({ ...rest });
       } else {
-        await knex('imageclassifications').insert({ datasetId, user, annotationId, type });
+        await knex('imageclassifications').insert({ datasetId, user, annotationId, ...rest });
       }
       res.send();
     } catch (err) {

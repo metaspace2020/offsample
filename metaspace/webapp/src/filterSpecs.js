@@ -133,7 +133,6 @@ const FILTER_SPECIFICATIONS = {
     optionFormatter: formatFDR,
     valueFormatter: formatFDR,
     filterable: false,
-    removable: false
   },
 
   institution: {
@@ -251,7 +250,6 @@ const FILTER_SPECIFICATIONS = {
     levels: ['annotation', 'dataset'],
     defaultInLevels: ['annotation', 'dataset'],
     initialValue: '',
-    removable: false
   },
 
   metadataType: {
@@ -261,7 +259,6 @@ const FILTER_SPECIFICATIONS = {
     levels: ['annotation', 'dataset', 'upload', 'imageclassifier'],
     defaultInLevels: ['annotation', 'dataset', 'upload', 'imageclassifier'],
     initialValue: defaultMetadataType,
-    removable: false,
     options: metadataTypes,
     hidden: () => metadataTypes.length <= 1
   }

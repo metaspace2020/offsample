@@ -9,8 +9,8 @@
              :key="annotation.id"
              :data-key="annotation.id"
              :class="getAnnotationClass(annotation.id)"
-             @mouseenter="e => $emit('mouseenter', Object.assign(e, {annotationId: annotation.id}))"
-             @mouseleave="e => $emit('mouseleave', Object.assign(e, {annotationId: annotation.id}))"
+             @mouseenter="e => $emit('mouseenter', Object.assign(e, {annotation}))"
+             @mouseleave="e => $emit('mouseleave', Object.assign(e, {annotation}))"
         >
           <image-loader :src="annotation.isotopeImages[0].url"
                         :colormap="colormap"
@@ -36,70 +36,17 @@
 <script lang="ts">
   import Vue from 'vue';
   import { Component, Prop } from 'vue-property-decorator';
-  import gql from 'graphql-tag';
-  import {debounce} from 'lodash-es';
+  import {chunk, debounce} from 'lodash-es';
   import Intersect from 'vue-intersect';
   import ImageLoader from '../../../components/ImageLoader.vue';
+  import { ICBlockAnnotation } from './ICBlockAnnotation';
 
-  const allAnnotationsQuery = gql`query AllAnnotations($filter: AnnotationFilter, $datasetFilter: DatasetFilter,
-                                                       $offset: Int, $limit: Int) {
-    allAnnotations(filter: $filter, datasetFilter: $datasetFilter,
-                   offset: $offset, limit: $limit, orderBy: ORDER_BY_MZ, sortingOrder: ASCENDING) {
-        id
-        sumFormula
-        adduct
-        msmScore
-        fdrLevel
-        mz
-        isotopeImages {
-          mz
-          url
-          minIntensity
-          maxIntensity
-          totalIntensity
-        }
-      }
-  }`;
-
-  interface MzImage {
-    mz: number;
-    url: string;
-    totalIntensity: number;
-    minIntensity: number;
-    maxIntensity: number;
-  }
-
-  interface Annotation {
-    id: string;
-    sumFormula: string;
-    adduct: string;
-    msmScore: number;
-    fdrLevel: number;
-    mz: number;
-    isotopeImages: MzImage[];
-  }
   type AnnotationLabel = undefined | 1 | 2 | 3 | 4; // none / on- / off- / ind / error
 
   @Component({
     components: {
       Intersect,
       ImageLoader,
-    },
-    apollo: {
-      allAnnotations: {
-        query: allAnnotationsQuery,
-        variables(this: ImageClassifierBlock) {
-          return {
-            offset: this.offset,
-            limit: this.limit,
-            ...this.gqlFilter,
-          };
-        },
-        loadingKey: 'loading',
-        skip(this: ImageClassifierBlock) {
-          return !this.isVisible;
-        }
-      },
     },
   })
   export default class ImageClassifierBlock extends Vue {
@@ -110,32 +57,23 @@
     @Prop({ default: 'Viridis' })
     colormap!: string;
     @Prop()
-    offset!: number;
-    @Prop()
-    limit!: number;
-    @Prop()
-    gqlFilter: any;
-    @Prop()
     numCols!: number;
     @Prop()
     annotationLabels!: Record<string, AnnotationLabel>;
+    @Prop()
+    annotations!: ICBlockAnnotation[];
 
     loading = 0;
     isVisible = false;
-    allAnnotations?: Annotation[];
 
-    get rows(): (Annotation | null)[][] {
-      const rows = [];
-      for (let i = 0; i < Math.floor(this.limit / this.numCols); i++) {
-        let annotations: (Annotation | null)[] = this.allAnnotations != null
-          ? this.allAnnotations.slice(i * this.numCols, (i + 1) * this.numCols)
-          : [];
-        // Pad rows so they're all the same width
-        while (annotations.length < this.numCols) {
-          annotations.push(null);
+    get rows(): (ICBlockAnnotation | null)[][] {
+      const rows = chunk(this.annotations, this.numCols) as (ICBlockAnnotation | null)[][];
+      // Pad rows so they're all the same width
+      rows.forEach(row => {
+        while (row.length < this.numCols) {
+          row.push(null);
         }
-        rows.push(annotations);
-      }
+      });
       return rows;
     }
 
