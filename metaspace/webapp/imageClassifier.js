@@ -22,9 +22,9 @@ const configureKnex = async () => {
       table.string('dsName');
       table.string('sumFormula');
       table.string('adduct');
-      table.number('msmScore');
-      table.number('fdrLevel');
-      table.number('mz');
+      table.float('msmScore');
+      table.float('fdrLevel');
+      table.float('mz');
       table.string('ionImageUrl');
       table.string('source');
     });
