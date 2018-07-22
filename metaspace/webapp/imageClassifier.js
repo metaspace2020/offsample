@@ -12,17 +12,21 @@ const configureKnex = async () => {
   if (!await knex.schema.hasTable('imageclassifications')) {
     await knex.schema.createTable('imageclassifications', (table) => {
       table.increments();
+      // Important fields
       table.string('datasetId');
       table.string('user');
       table.string('annotationId');
-      table.string('sumFormula');
-      table.string('adduct');
-      table.string('msmScore');
-      table.string('fdrLevel');
-      table.string('mz');
-      table.string('ionImageUrl');
       table.int('type');
       table.unique(['datasetId','user','annotationId']);
+      // Additional info
+      table.string('dsName');
+      table.string('sumFormula');
+      table.string('adduct');
+      table.number('msmScore');
+      table.number('fdrLevel');
+      table.number('mz');
+      table.string('ionImageUrl');
+      table.string('source');
     });
   }
 
@@ -38,8 +42,9 @@ const configureImageClassifier = async (app) => {
       if (!datasetId || !user) {
         next();
       }
-      const results = await knex('imageclassifications').where({ datasetId, user });
-      res.send(mapValues(keyBy(results, 'annotationId'), 'type'));
+      const results = await knex('imageclassifications').where({ datasetId, user }).whereNotNull('type');
+      res.send(results);
+      // res.send(mapValues(keyBy(results, 'annotationId'), 'type'));
     } catch (err) {
       next(err);
     }
@@ -57,7 +62,7 @@ const configureImageClassifier = async (app) => {
     } catch (err) {
       next(err);
     }
-  })
+  });
 };
 
 

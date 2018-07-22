@@ -16,7 +16,9 @@
       <div style="background-color: #CCFFCC" >{{ stats.un }} unassigned</div>
     </div>
     <div class="header">
-      <filter-panel level="imageclassifier" />
+      <div style="display: none;">
+        <filter-panel level="imageclassifier" />
+      </div>
       <ul>
         <li>Left-click or + to mark an image as <span style="background-color: #CCFFCC" >on-sample</span></li>
         <li>Right-click or - to mark an image as <span style="background-color: #FFCCCC" >off-sample</span></li>
@@ -45,33 +47,15 @@
 <script lang="ts">
   import Vue from 'vue';
   import { Component, Watch } from 'vue-property-decorator';
-  import gql from 'graphql-tag';
   import FilterPanel from '../../../components/FilterPanel.vue';
   import ImageClassifierBlock from './ImageClassifierBlock.vue';
   import * as config from '../../../clientConfig.json';
   import {confetti} from 'dom-confetti';
-  import { chunk, cloneDeep, get, pick, range } from 'lodash-es';
+  import { chunk, cloneDeep, get, keyBy, mapValues, pick, range } from 'lodash-es';
   import Prando from 'prando';
-  import { ICBlockAnnotation } from './ICBlockAnnotation';
+  import { AnnotationLabel, ICBlockAnnotation, ICBlockAnnotationsQuery } from './ICBlockAnnotation';
 
-  const allAnnotationsQuery = gql`query AllAnnotations($filter: AnnotationFilter, $datasetFilter: DatasetFilter) {
-    allAnnotations(filter: $filter, datasetFilter: $datasetFilter,
-                   offset: 0, limit: 10000, orderBy: ORDER_BY_MZ, sortingOrder: ASCENDING) {
-        id
-        sumFormula
-        adduct
-        msmScore
-        fdrLevel
-        mz
-        isotopeImages {
-          mz
-          url
-          minIntensity
-          maxIntensity
-          totalIntensity
-        }
-      }
-  }`;
+
 
   const onKeys = ['+','=','CTRL', 'MOUSE0'];
   const offKeys = ['-', 'SHIFT', 'MOUSE2'];
@@ -90,7 +74,7 @@
     },
     apollo: {
       allAnnotations: {
-        query: allAnnotationsQuery,
+        query: ICBlockAnnotationsQuery,
         variables(this: ImageClassifierPage) {
           return this.gqlFilter;
         },
@@ -112,6 +96,7 @@
     keys: Record<string, boolean> = {};
     selectedAnnotation: ICBlockAnnotation | null = null;
     annotationLabels: Record<string, number> = {};
+    annotationLabelsRaw: AnnotationLabel[] = [];
 
     created() {
       this.loadLabels();
@@ -135,7 +120,8 @@
         else if (label === 2) off++;
         else if (label === 3) ind++;
         else un++;
-      })
+      });
+
       return {on, off, ind, un}
     }
     get gqlFilter () {
@@ -222,6 +208,16 @@
       }
     }
 
+    fieldsForAnnotation({dataset, id, sumFormula, adduct, msmScore, fdrLevel, mz, isotopeImages}: ICBlockAnnotation) {
+      return {
+        datasetId: dataset.id,
+        dsName: dataset.name,
+        annotationId: id,
+        sumFormula, adduct, msmScore, fdrLevel, mz,
+        ionImageUrl: get(isotopeImages, [0, 'url']),
+      }
+    }
+
     async doSelection(event?: Event) {
       if (this.allAnnotations && this.selectedAnnotation) {
         const on = onKeys.some(key => this.keys[key]);
@@ -249,12 +245,11 @@
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
-                  datasetId: this.datasetId,
+                  ...this.fieldsForAnnotation(this.selectedAnnotation),
                   user: this.user,
-                  annotationId: this.selectedAnnotation.id,
+                  source: 'UI',
                   type,
-                  ...pick(this.selectedAnnotation, 'sumFormula', 'adduct', 'msmScore', 'fdrLevel', 'mz'),
-                  ionImageUrl: get(this.selectedAnnotation, ['isotopeImages', 0, 'url'])
+
                 })
               });
             } catch (err) {
@@ -277,11 +272,14 @@
         try {
           this.loading += 1;
           const response = await fetch(`${config.imageClassifierUrl}${query}`);
-          const labels = await response.json();
+          const labels = await response.json() as AnnotationLabel[];
           // Double-check nothing has changed while loading
           if (datasetId === this.datasetId && user === this.user) {
-            this.annotationLabels = labels;
+            this.annotationLabelsRaw = labels;
+            const index = mapValues(keyBy(labels, 'annotationId'), 'type');
+            this.annotationLabels = index;
           }
+
         } catch (err) {
           console.log(err);
           if (datasetId === this.datasetId && user === this.user) {
