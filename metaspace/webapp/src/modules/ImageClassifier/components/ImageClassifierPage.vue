@@ -146,7 +146,7 @@
       return this.$route.query.label;
     }
     get sampledAnnotations(): ICBlockAnnotation[] {
-      if (this.allAnnotations != null) {
+      if (this.allAnnotations != null && this.datasetId != null) {
         const annotations = this.allAnnotations.slice();
         // Cut down to desired size, hopefully in a relatively repeatable fashion
         const rng = new Prando(this.datasetId);
@@ -162,7 +162,7 @@
     @Watch('labelFilter')
     updateBlocks() {
       // Apply label-based filters lazily so that the page doesn't constantly update
-      const idx = LABELS.indexOf(this.labelFilter);
+      const idx = this.labelFilter == null ? -1 : LABELS.indexOf(this.labelFilter);
       const labelFilter = idx === -1 ? null : idx;
       let filteredAnnotations: ICBlockAnnotation[];
       if (idx === -1) {
