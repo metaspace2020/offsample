@@ -47,7 +47,6 @@
 <script lang="ts">
   import Vue from 'vue';
   import { Component, Watch } from 'vue-property-decorator';
-  import gql from 'graphql-tag';
   import FilterPanel from '../../../components/FilterPanel.vue';
   import ImageClassifierBlock from './ImageClassifierBlock.vue';
   import * as config from '../../../clientConfig.json';
@@ -55,6 +54,7 @@
   import { chunk, cloneDeep, get, keyBy, mapValues, pick, range } from 'lodash-es';
   import Prando from 'prando';
   import { AnnotationLabel, ICBlockAnnotation, ICBlockAnnotationsQuery } from './ICBlockAnnotation';
+  import './importTool';
 
 
 
