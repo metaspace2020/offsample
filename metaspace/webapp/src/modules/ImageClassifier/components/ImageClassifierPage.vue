@@ -10,11 +10,11 @@
     @contextmenu.prevent
   >
     <div class="floatingHeader">
-      <div style="background-color: #CCFFCC; cursor: pointer;" @click="handleFilterByLabel('on')" >{{ stats.on }} on-sample</div>
-      <div style="background-color: #FFCCCC; cursor: pointer;" @click="handleFilterByLabel('off')" >{{ stats.off }} off-sample</div>
-      <div style="background-color: #FFFFCC; cursor: pointer;" @click="handleFilterByLabel('ind')" >{{ stats.ind }} unknown</div>
-      <div style="background-color: #CCFFCC; cursor: pointer;" @click="handleFilterByLabel('un')" >{{ stats.un }} unassigned</div>
-      <div v-if="labelFilter" @click="handleFilterByLabel(null)" >Clear filter</div>
+      <div style="background-color: #CCFFCC; cursor: pointer;" :style="{fontWeight: labelFilter === 'on' ? 'bold' : 'normal'}" @click="handleFilterByLabel('on')">{{ stats.on }} on-sample</div>
+      <div style="background-color: #FFCCCC; cursor: pointer;" :style="{fontWeight: labelFilter === 'off' ? 'bold' : 'normal'}" @click="handleFilterByLabel('off')">{{ stats.off }} off-sample</div>
+      <div style="background-color: #FFFFCC; cursor: pointer;" :style="{fontWeight: labelFilter === 'ind' ? 'bold' : 'normal'}" @click="handleFilterByLabel('ind')">{{ stats.ind }} unknown</div>
+      <div style="background-color: #EEEEEE; cursor: pointer;" :style="{fontWeight: labelFilter === 'un' ? 'bold' : 'normal'}" @click="handleFilterByLabel('un')">{{ stats.un }} unassigned</div>
+      <div v-if="labelFilter" style="cursor: pointer;" @click="handleFilterByLabel(null)">Show all</div>
     </div>
     <div class="header">
       <div style="display: none;">
