@@ -38,13 +38,18 @@ const configureImageClassifier = async (app) => {
 
   app.get('/imageclassifier', async (req, res, next) => {
     try {
-      const { datasetId, user } = req.query;
+      const { datasetId, user, raw } = req.query;
       if (!datasetId || !user) {
         next();
       }
-      const results = await knex('imageclassifications').where({ datasetId, user }).whereNotNull('type');
-      res.send(results);
-      // res.send(mapValues(keyBy(results, 'annotationId'), 'type'));
+      if (raw) {
+        const results = await knex('imageclassifications').where({ datasetId, user }).whereNotNull('type');
+        res.send(results);
+      } else {
+        // Only send an id->label map
+        const results = await knex('imageclassifications').where({ datasetId, user }).whereNotNull('type').select('annotationId', 'type');
+        res.send(mapValues(keyBy(results, 'annotationId'), 'type'));
+      }
     } catch (err) {
       next(err);
     }

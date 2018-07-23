@@ -47,6 +47,7 @@
 <script lang="ts">
   import Vue from 'vue';
   import { Component, Watch } from 'vue-property-decorator';
+  import gql from 'graphql-tag';
   import FilterPanel from '../../../components/FilterPanel.vue';
   import ImageClassifierBlock from './ImageClassifierBlock.vue';
   import * as config from '../../../clientConfig.json';
@@ -96,7 +97,6 @@
     keys: Record<string, boolean> = {};
     selectedAnnotation: ICBlockAnnotation | null = null;
     annotationLabels: Record<string, number> = {};
-    annotationLabelsRaw: AnnotationLabel[] = [];
 
     created() {
       this.loadLabels();
@@ -272,12 +272,10 @@
         try {
           this.loading += 1;
           const response = await fetch(`${config.imageClassifierUrl}${query}`);
-          const labels = await response.json() as AnnotationLabel[];
+          const labels = await response.json() as Record<string, number>;
           // Double-check nothing has changed while loading
           if (datasetId === this.datasetId && user === this.user) {
-            this.annotationLabelsRaw = labels;
-            const index = mapValues(keyBy(labels, 'annotationId'), 'type');
-            this.annotationLabels = index;
+            this.annotationLabels = labels;
           }
 
         } catch (err) {
