@@ -10,10 +10,11 @@
     @contextmenu.prevent
   >
     <div class="floatingHeader">
-      <div style="background-color: #CCFFCC" >{{ stats.on }} on-sample</div>
-      <div style="background-color: #FFCCCC" >{{ stats.off }} off-sample</div>
-      <div style="background-color: #FFFFCC" >{{ stats.ind }} unknown</div>
-      <div style="background-color: #CCFFCC" >{{ stats.un }} unassigned</div>
+      <div style="background-color: #CCFFCC; cursor: pointer;" @click="handleFilterByLabel('on')" >{{ stats.on }} on-sample</div>
+      <div style="background-color: #FFCCCC; cursor: pointer;" @click="handleFilterByLabel('off')" >{{ stats.off }} off-sample</div>
+      <div style="background-color: #FFFFCC; cursor: pointer;" @click="handleFilterByLabel('ind')" >{{ stats.ind }} unknown</div>
+      <div style="background-color: #CCFFCC; cursor: pointer;" @click="handleFilterByLabel('un')" >{{ stats.un }} unassigned</div>
+      <div v-if="labelFilter" @click="handleFilterByLabel(null)" >Clear filter</div>
     </div>
     <div class="header">
       <div style="display: none;">
@@ -51,11 +52,12 @@
   import ImageClassifierBlock from './ImageClassifierBlock.vue';
   import * as config from '../../../clientConfig.json';
   import {confetti} from 'dom-confetti';
-  import { chunk, cloneDeep, get, keyBy, mapValues, pick, range } from 'lodash-es';
+  import { chunk, cloneDeep, get, keyBy, mapValues, omit, pick, range } from 'lodash-es';
   import Prando from 'prando';
   import { AnnotationLabel, ICBlockAnnotation, ICBlockAnnotationsQuery } from './ICBlockAnnotation';
   import './importTool';
 
+  const LABELS = ['un', 'on', 'off', 'ind'];
 
 
   const onKeys = ['+','=','CTRL', 'MOUSE0'];
@@ -97,6 +99,7 @@
     keys: Record<string, boolean> = {};
     selectedAnnotation: ICBlockAnnotation | null = null;
     annotationLabels: Record<string, number> = {};
+    blocks: ICBlockAnnotation[][] = [];
 
     created() {
       this.loadLabels();
@@ -114,7 +117,7 @@
     get stats() {
       let on = 0, off = 0, ind = 0, un = 0;
       // Who needs efficient algorithms? This still manages to run in <1ms when there are 800 annotations!
-      this.filteredAnnotations.forEach(({id}) => {
+      this.sampledAnnotations.forEach(({id}) => {
         const label = this.annotationLabels[id];
         if (label === 1) on++;
         else if (label === 2) off++;
@@ -130,16 +133,19 @@
         datasetFilter: this.$store.getters.gqlDatasetFilter,
       };
     }
-    get datasetId(): string {
+    get datasetId(): string  | null {
       return this.$store.getters.gqlDatasetFilter.ids;
     }
-    get user(): string {
+    get user(): string | null {
       return this.$route.query.user;
     }
     get max(): number {
       return Number.parseInt(this.$route.query.max) || 1000;
     }
-    get filteredAnnotations(): ICBlockAnnotation[] {
+    get labelFilter(): string | undefined {
+      return this.$route.query.label;
+    }
+    get sampledAnnotations(): ICBlockAnnotation[] {
       if (this.allAnnotations != null) {
         const annotations = this.allAnnotations.slice();
         // Cut down to desired size, hopefully in a relatively repeatable fashion
@@ -150,11 +156,25 @@
         return annotations;
       }
       return []
+    }
 
+    @Watch('sampledAnnotations')
+    @Watch('labelFilter')
+    updateBlocks() {
+      // Apply label-based filters lazily so that the page doesn't constantly update
+      const idx = LABELS.indexOf(this.labelFilter);
+      const labelFilter = idx === -1 ? null : idx;
+      let filteredAnnotations: ICBlockAnnotation[];
+      if (idx === -1) {
+        filteredAnnotations = this.sampledAnnotations;
+      } else if (idx === 0) {
+        filteredAnnotations = this.sampledAnnotations.filter(({id}) => this.annotationLabels[id] == null);
+      } else {
+        filteredAnnotations = this.sampledAnnotations.filter(({id}) => this.annotationLabels[id] === idx);
+      }
+      this.blocks = chunk(filteredAnnotations, 12);
     }
-    get blocks(): ICBlockAnnotation[][] {
-      return chunk(this.filteredAnnotations, 12);
-    }
+
 
     handleBeforeUnload(e: Event) {
       e.preventDefault();
@@ -205,6 +225,21 @@
     handleMouseLeave(event: MouseEvent & { annotation: ICBlockAnnotation }) {
       if (this.selectedAnnotation == event.annotation) {
         this.selectedAnnotation = null;
+      }
+    }
+
+    handleFilterByLabel(label: string | null) {
+      if (this.$route.query.label === label || label == null) {
+        this.$router.push({
+          query: omit(this.$route.query, 'label')
+        })
+      } else {
+        this.$router.push({
+          query: {
+            ...this.$route.query,
+            label
+          }
+        })
       }
     }
 
