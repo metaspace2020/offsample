@@ -6,13 +6,29 @@
 
 ### Web app for tagging ion images
 
+TagOff was rapidly prototyped using the [METASPACE codebase](https://github.com/metaspace2020/metaspace/) as a foundation,
+allowing its back-end, image display and annotation filtering to be reused.
+The TagOff-specific changes can be found [in this commit range](https://github.com/metaspace2020/offsample/compare/0f772124...3ed8b524).
+
+It can be run by [starting the METASPACE webapp](./TagOff/metaspace/webapp/README.md),
+then navigating to http://localhost:8999/#/imageclassifier?db=HMDB-v4&user=your_name&max=10000&ds=2016-12-07_07h59m24s.
+The querystring of the URL encodes the filter criteria used to select the annotations.
+New criteria can be created and copied from [the Annotations page of METASPACE](https://metaspace2020.eu/annotations).
+Two other parameters exist: `max` and `user`. `max` limits the number of annotations shown, and `user` accepts a name
+which is added to the image labels, allowing multiple people to independently label the same image.
+
+After annotations have been made, the data can be exported with:
+```sh
+sqlite3 -header -csv ./metaspace/webapp/imageclassification.sqlite "select * from imageclassifications" > ./metaspace/webapp/dist/results.csv
+```
+
 ### Gold standard
 
 ## CNN methods
 
 ## Future steps
 
-We are planning to integrate the best methods into [https://metaspace2020.eu](https://metaspace2020.eu). 
+We are planning to integrate the best methods into [https://metaspace2020.eu](https://metaspace2020.eu).
 
 ## Acknowledgements
 
