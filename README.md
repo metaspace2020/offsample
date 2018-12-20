@@ -36,7 +36,7 @@ sqlite3 -header -csv ./metaspace/webapp/imageclassification.sqlite "select * fro
 
 ## DHB matrix clusters
 
-We have generated DHB matrix clusters according to [https://www.sciencedirect.com/science/article/pii/S1044030599001269]((Keller, Li, 2000)). This resulted in 353 molecular formulas available here.
+We have generated DHB matrix clusters according to [(Keller and Li, 2000)](./DHB%20matrix%20clusters/Keller%20and%20Li%2C%202000.pdf). This resulted in 353 molecular formulas available [here](./DHB%20matrix%20clusters/DHB%20mc%20mol%20formulas%2C%20predicted.csv).
 
 ## Future steps
 
