@@ -32,6 +32,12 @@ sqlite3 -header -csv ./metaspace/webapp/imageclassification.sqlite "select * fro
 
 ### Gold standard
 
+The images can be downloaded from AWS S3
+```sh
+wget https://s3-eu-west-1.amazonaws.com/sm-off-sample/GS.tar.gz
+tar -xf GS.tar.gz
+```
+
 ## CNN methods
 
 ## DHB matrix clusters
