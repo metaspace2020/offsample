@@ -40,6 +40,9 @@ tar -xf GS.tar.gz
 
 ## CNN methods
 
+We trained Convolutinal Neural Networks using Fastai and PyTorch libraries.
+The best performance we achieved using Resnet50 CNN pretrained on Imagenet.
+
 ## DHB matrix clusters
 
 We have generated DHB matrix clusters according to [(Keller and Li, 2000)](./DHB%20matrix%20clusters/Keller%20and%20Li%2C%202000.pdf). This resulted in 353 molecular formulas available [here](./DHB%20matrix%20clusters/DHB%20mc%20mol%20formulas%2C%20predicted.csv).
