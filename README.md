@@ -34,6 +34,10 @@ sqlite3 -header -csv ./metaspace/webapp/imageclassification.sqlite "select * fro
 
 ## CNN methods
 
+## DHB matrix clusters
+
+We have generated DHB matrix clusters according to [https://www.sciencedirect.com/science/article/pii/S1044030599001269]((Keller, Li, 2000)). This resulted in 353 molecular formulas available here.
+
 ## Future steps
 
 We are planning to integrate the best methods into [https://metaspace2020.eu](https://metaspace2020.eu).
