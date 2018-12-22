@@ -30,12 +30,21 @@ After annotations have been made, the data can be exported with:
 sqlite3 -header -csv ./metaspace/webapp/imageclassification.sqlite "select * from imageclassifications" > ./metaspace/webapp/dist/results.csv
 ```
 
+## Download Data
+
 ### Gold standard
 
 The images can be downloaded from AWS S3
 ```sh
 wget https://s3-eu-west-1.amazonaws.com/sm-off-sample/GS.tar.gz
 tar -xf GS.tar.gz
+```
+
+### Single pixel export
+
+```sh
+wget https://s3-eu-west-1.amazonaws.com/sm-off-sample/pixel-annot-export-v0.10.tar.gz
+tar -xf pixel-annot-export-v0.10.tar.gz
 ```
 
 ## CNN methods
