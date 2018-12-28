@@ -3,10 +3,10 @@
 This repository is devoted to a computational project on recognizing off-sample images in the field of imaging mass spectrometry. The project is carried out by the [Alexandrov team](https://www.embl.de/research/units/scb/alexandrov/) at EMBL Heidelberg. We used public data from [METASPACE](http://metaspace2020.eu) to create a gold standard set of ion images, as well as developed and evaluated several methods for recognizing off-sample ion images.
 
 Team:
-- [Katja Ovchinnikova](http://ovchinnikova.me/): gold standard preparation, method development
+- [Katja Ovchinnikova](http://ovchinnikova.me/): method development, gold standard preparation
 - [Vitaly Kovalev](https://github.com/intsco): CNN and DL method development
 - [Lachlan Stuart](https://github.com/LachlanStuart): web development
-- [Theodore Alexandrov](https://www.embl.de/research/units/scb/alexandrov/members/index.php?s_personId=CP-60020464): supervision
+- [Theodore Alexandrov](https://www.embl.de/research/units/scb/alexandrov/members/index.php?s_personId=CP-60020464): supervision, gold standard preparation
 
 ## Creating gold standard ion images
 
@@ -30,9 +30,9 @@ After annotations have been made, the data can be exported with:
 sqlite3 -header -csv ./metaspace/webapp/imageclassification.sqlite "select * from imageclassifications" > ./metaspace/webapp/dist/results.csv
 ```
 
-## Download Data
+## Data
 
-### Gold standard
+### Gold standard ion images
 
 The images can be downloaded from AWS S3
 ```sh
@@ -40,7 +40,7 @@ wget https://s3-eu-west-1.amazonaws.com/sm-off-sample/GS.tar.gz
 tar -xf GS.tar.gz
 ```
 
-### Single pixel export
+### METASPACE knowledge base
 
 ```sh
 wget https://s3-eu-west-1.amazonaws.com/sm-off-sample/pixel-annot-export-v0.10.tar.gz
@@ -62,7 +62,7 @@ We are planning to integrate the best methods into [https://metaspace2020.eu](ht
 
 ## Acknowledgements
 
-TODO: Acknowledging the users contributed the public datasets used in this project
+We thank the contributors of all public data to METASPACE and particularly those whose data was selected for the gold standard: Sarah Aboulmagd, Michael Becker, Dhaka Bhandari, Mark Bokhart, Berin Boughton, Shane Ellis, Mathieu Gaudin, Erin Gemperline, Cristina Gonzalez Lopez, Richard Goodwin, Anne Mette Handler, Bram Heijs, Sophie Jacobsen, Christian Janfelt, Emrys Jones, Patrik Kadesch, Pegah Khamehgir-Silz, Mario Kompauer, Lingjun Li, Manuel Liebeke, Michael Linscheid, James McKenzie, David Muddiman, Andrew Palmer, József Pánczél, Marina Reuter, Livia S. Eberlin, Veronika Saharuka, Marta Sans, Julian Schneemann, Kumar Sharma, Bernhard Spengler, Nicole Strittmatter, Zoltan Takats, Dusan Velickovic, Eric Weaver, Guanshi Zhang. The work was supported by the funding from the EU Horizon2020 project METASPACE (No. 634402), NIH NIDDK project KPMP, ERC Consolidator project METACELL (No. 773089).
 
 ## License
 
