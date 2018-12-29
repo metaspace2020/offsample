@@ -3,9 +3,9 @@
 This repository is devoted to a computational project on recognizing off-sample images in the field of imaging mass spectrometry. The project is carried out by the [Alexandrov team](https://www.embl.de/research/units/scb/alexandrov/) at EMBL Heidelberg. We used public data from [METASPACE](http://metaspace2020.eu) to create a gold standard set of ion images, as well as developed and evaluated several methods for recognizing off-sample ion images.
 
 Team:
-- [Katja Ovchinnikova](http://ovchinnikova.me/): method development, gold standard preparation
-- [Vitaly Kovalev](https://github.com/intsco): CNN and DL method development
-- [Lachlan Stuart](https://github.com/LachlanStuart): web development
+- [Katja Ovchinnikova](http://ovchinnikova.me/): molecular similarity method development, gold standard preparation
+- [Vitaly Kovalev](https://github.com/intsco): CNN method development
+- [Lachlan Stuart](https://github.com/LachlanStuart): TagOff web development
 - [Theodore Alexandrov](https://www.embl.de/research/units/scb/alexandrov/members/index.php?s_personId=CP-60020464): supervision, gold standard preparation
 
 ## Creating gold standard ion images
