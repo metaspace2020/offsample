@@ -4,8 +4,8 @@ This repository is devoted to a computational project on recognizing off-sample 
 
 Team:
 - [Katja Ovchinnikova](http://ovchinnikova.me/): molecular similarity method development, gold standard preparation
-- [Vitaly Kovalev](https://github.com/intsco): CNN method development
-- [Lachlan Stuart](https://github.com/LachlanStuart): TagOff web development
+- [Vitaly Kovalev](https://github.com/intsco): deep learning method development
+- [Lachlan Stuart](https://github.com/LachlanStuart): development of the TagOff web app
 - [Theodore Alexandrov](https://www.embl.de/research/units/scb/alexandrov/members/index.php?s_personId=CP-60020464): supervision, gold standard preparation
 
 ## Creating gold standard ion images
