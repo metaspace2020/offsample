@@ -2,7 +2,7 @@
 
 # Requirements
 
-* gensim
+* sklearn
 
 ## Setup
 
@@ -11,5 +11,4 @@
 ## Run
 
 * start Jupyter
-* open and run `generate_colloc_sim_vectors.ipynb`
-* open and run `ion_classification_mol_sim.ipynb`
+* open and run `ion_classification_biclustering.ipynb`
