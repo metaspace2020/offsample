@@ -1,6 +1,6 @@
-# Recognizing off-sample mass spectrometry images
+# Recognizing off-sample mass spectrometry images with machine and deep learning
 
-This repository is devoted to a computational project on recognizing off-sample images in the field of imaging mass spectrometry. The project is carried out by the [Alexandrov team](https://www.embl.de/research/units/scb/alexandrov/) at EMBL Heidelberg. We used public data from [METASPACE](http://metaspace2020.eu) to create a gold standard set of ion images, as well as developed and evaluated several methods for recognizing off-sample ion images.
+This repository is devoted to a computational project on recognizing so-called off-sample images in imaging mass spectrometry data. The project is carried out by the [Alexandrov team](https://www.embl.de/research/units/scb/alexandrov/) at EMBL Heidelberg. We used public data from [METASPACE](http://metaspace2020.eu) to create a gold standard set of ion images, as well as developed and evaluated several methods for recognizing off-sample ion images.
 
 Team:
 - [Katja Ovchinnikova](http://ovchinnikova.me/): biclustering and molecular co-localization method development, gold standard preparation
@@ -11,6 +11,8 @@ Team:
 ## Creating gold standard ion images
 
 ### Using public METASPACE datasets
+
+We used public datasets from [METASPACE](http://metaspace2020.eu), a community-populated knowledge base of metabolite images. Please see the section Acknowledgements acknowledging contributors of the used data.
 
 ### Web app for tagging ion images
 
