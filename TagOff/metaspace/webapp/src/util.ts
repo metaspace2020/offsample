@@ -33,9 +33,9 @@ function checkStatus(response: Response): Response {
 }
 
 function getJWT(): Promise<JWT> {
-  if (config.graphqlUrl != null && config.graphqlUrl.startsWith('http://metaspace2020.eu')) {
+  if (config.graphqlUrl != null && config.graphqlUrl.startsWith('https://metaspace2020.eu')) {
     // Anonymous token hard-coded for cross-domain auth
-    return Promise.resolve('eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJNRVRBU1BBQ0UyMDIwIiwicm9sZSI6ImFub255bW91cyJ9.Hl0h6crcHLb-SPm7nomXkQco5l2iAO6D1bwdjmOaFXM');
+    return Promise.resolve('eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJNRVRBU1BBQ0UyMDIwIiwidXNlciI6eyJyb2xlIjoiYW5vbnltb3VzIn19.qtxwc5LWwF7BVEHrRcexk5J24ExATzusdPsu8llprdw');
   } else {
     return fetch("/getToken", { credentials: 'include' })
       .then(checkStatus).then(resp => resp.text())
