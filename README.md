@@ -39,8 +39,6 @@ sqlite3 -header -csv ./metaspace/webapp/imageclassification.sqlite "select * fro
 The images are available on the [release page](https://github.com/metaspace2020/offsample/releases/tag/0.1)
 under `GS.tar.gz` file name
 
-https://github.com/metaspace2020/offsample/releases/tag/untagged-2d463ff7e75bcf886c11
-
 ### METASPACE knowledge base
 
 ```sh

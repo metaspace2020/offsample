@@ -32,5 +32,5 @@ python -m ipykernel install --user --name offsample-fastai --display-name "offsa
 ## Pretrained Model
 
 A model pretrained with [fastai](https://docs.fast.ai) library is provided on the
-[release page]([release page](https://github.com/metaspace2020/offsample/releases/tag/0.1))
+[release page](https://github.com/metaspace2020/offsample/releases/tag/0.1)
 under `model.fai` name
