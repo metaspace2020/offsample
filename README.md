@@ -36,11 +36,10 @@ sqlite3 -header -csv ./metaspace/webapp/imageclassification.sqlite "select * fro
 
 ### Gold standard ion images
 
-The images can be downloaded from AWS S3
-```sh
-wget https://s3-eu-west-1.amazonaws.com/sm-off-sample/GS.tar.gz
-tar -xf GS.tar.gz
-```
+The images are available on the [release page](https://github.com/metaspace2020/offsample/releases/tag/0.1)
+under `GS.tar.gz` file name
+
+https://github.com/metaspace2020/offsample/releases/tag/untagged-2d463ff7e75bcf886c11
 
 ### METASPACE knowledge base
 
@@ -51,8 +50,13 @@ tar -xf pixel-annot-export-v0.10.tar.gz
 
 ## CNN methods
 
-We trained Convolutinal Neural Networks using Fastai and PyTorch libraries.
-The best performance we achieved using Resnet50 CNN pretrained on Imagenet.
+We trained Convolutional Neural Networks using Fastai and PyTorch libraries.
+The best performance we achieved using Resnet50 CNN pretrained on Imagenet. More details [here](CNN/README.md)
+
+### Model REST API Implementation
+
+The model was wrapped into a web service and deployed as a part of [Metaspace](https://metaspace2020.eu).
+The service implementation is available on [GitHub](https://github.com/metaspace2020/metaspace/tree/master/metaspace/off-sample)
 
 ## DHB matrix clusters
 

@@ -1,6 +1,6 @@
 # Recognizing off-sample mass spectrometry images with Convolutional Neural Networks
 
-# Requirements
+## Requirements
 
 * Ubuntu >= 14.04
 * Conda >= 4.5.11
@@ -28,3 +28,9 @@ python -m ipykernel install --user --name offsample-fastai --display-name "offsa
 ## Run
 
 * Start Jupyter and open `train_fastai_on_gs.ipynb`
+
+## Pretrained Model
+
+A model pretrained with [fastai](https://docs.fast.ai) library is provided on the
+[release page]([release page](https://github.com/metaspace2020/offsample/releases/tag/0.1))
+under `model.fai` name
