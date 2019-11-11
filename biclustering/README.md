@@ -1,6 +1,6 @@
 # Classifying mass spectrometry images as off or on sample using molecular co-localization
 
-# Requirements
+## Requirements
 
 * sklearn
 
