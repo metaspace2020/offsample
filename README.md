@@ -34,16 +34,26 @@ sqlite3 -header -csv ./metaspace/webapp/imageclassification.sqlite "select * fro
 
 ## Data
 
+Copy and paste the commands below into a terminal  
+
 ### Gold standard ion images
 
-The images are available on the [release page](https://github.com/metaspace2020/offsample/releases/tag/0.1)
-under `GS.tar.gz` file name
+To download and unpack an archive with the images
+```
+wget -qO - https://github.com/metaspace2020/offsample/releases/download/0.2/GS.tar.gz | tar -xvz
+```
+
+### Gold standard ion images predictions
+
+To download and unpack an archive with the images grouped by a predicted class as well as predicted probabilities
+```
+wget -qO - https://github.com/metaspace2020/offsample/releases/download/0.2/gs_predictions.tar.gz | tar -xvz
+```
 
 ### METASPACE knowledge base
 
-```sh
-wget https://s3-eu-west-1.amazonaws.com/sm-off-sample/pixel-annot-export-v0.10.tar.gz
-tar -xf pixel-annot-export-v0.10.tar.gz
+```
+wget -qO - https://s3-eu-west-1.amazonaws.com/sm-off-sample/pixel-annot-export-v0.10.tar.gz | tar -xvz
 ```
 
 ## CNN methods
