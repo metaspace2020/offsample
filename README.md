@@ -2,6 +2,8 @@
 
 This repository is devoted to a computational project on recognizing so-called off-sample images in imaging mass spectrometry data. The project is carried out by the [Alexandrov team](https://www.embl.de/research/units/scb/alexandrov/) at EMBL Heidelberg. We used public data from [METASPACE](http://metaspace2020.eu) to create a gold standard set of ion images, as well as developed and evaluated several methods for recognizing off-sample ion images.
 
+For more information, please see our recent paper [Ovchinnikova et al. (2020) BMC Bioinformatics](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-020-3425-x).
+
 Team:
 - [Katja Ovchinnikova](http://ovchinnikova.me/): biclustering and molecular co-localization method development, gold standard preparation
 - [Vitaly Kovalev](https://github.com/intsco): deep learning method development
@@ -73,6 +75,9 @@ We have generated DHB matrix clusters according to [(Keller and Li, 2000)](./DHB
 ## Future steps
 
 We are planning to integrate the best methods into [https://metaspace2020.eu](https://metaspace2020.eu).
+
+## Citation
+Would like to cite this project in a scientific publication? Please cite [Ovchinnikova et al. (2020) BMC Bioinformatics](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-020-3425-x).
 
 ## Acknowledgements
 
